@@ -1,0 +1,191 @@
+openapi: 3.0.0
+info:
+  title: Product API
+  description: Yash Technologies Product API
+  contact:
+    email: yash.sharma@yash.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0-oas3
+servers:
+- url: /
+tags:
+- name: admins
+  description: Secured Admin-only calls
+- name: developers
+  description: Operations available to regular developers
+paths:
+  /product:
+    get:
+      tags:
+      - developers
+      summary: searches products
+      description: |
+        By passing in the appropriate options, you can search for available product in the system
+      operationId: searchProducts
+      parameters:
+      - name: limit
+        in: query
+        description: maximum number of records to return
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 50.0
+          minimum: 0
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        "400":
+          description: bad input parameter
+    put:
+      tags:
+      - admins
+      summary: updates an product item
+      description: Updates an product item to the system
+      operationId: updateProduct
+      requestBody:
+        $ref: '#/components/requestBodies/Product'
+      responses:
+        "201":
+          description: item updated
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: invalid input, object invalid
+    post:
+      tags:
+      - admins
+      summary: adds an product item
+      description: Adds an product item to the system
+      operationId: addProduct
+      requestBody:
+        $ref: '#/components/requestBodies/Product'
+      responses:
+        "201":
+          description: item created
+        "400":
+          description: invalid input, object invalid
+        "409":
+          description: an existing item already exists
+    delete:
+      tags:
+      - admins
+      summary: deletes an product item
+      description: Deletes an product item from the system
+      operationId: deleteProduct
+      requestBody:
+        $ref: '#/components/requestBodies/Product'
+      responses:
+        "201":
+          description: item deleted
+        "400":
+          description: invalid input, object invalid
+  /product/{uuid}:
+    get:
+      tags:
+      - developers
+      summary: search product by id
+      description: |
+        By passing in the appropriate options, you can search for available product in the system
+      operationId: searchProduct
+      parameters:
+      - name: uuid
+        in: path
+        description: Product UUID to return.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: search results matching criteria
+        "400":
+          description: bad input parameter
+components:
+  schemas:
+    Product:
+      required:
+      - id
+      - name
+      - price
+      - sku
+      - startDate
+      type: object
+      properties:
+        id:
+          type: string
+          format: string
+        uuid:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: number
+        price:
+          $ref: '#/components/schemas/Price'
+        dimensions:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        manufacturer:
+          $ref: '#/components/schemas/Manufacturer'
+    Price:
+      required:
+      - id
+      - price
+      - priceType
+      type: object
+      properties:
+        id:
+          type: string
+        price:
+          type: number
+        priceType:
+          type: string
+          enum:
+          - List
+          - Default
+          - Promo
+        uom:
+          type: string
+    Manufacturer:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        homePage:
+          type: string
+          format: url
+        phone:
+          type: string
+  requestBodies:
+    Product:
+      description: Product item to add
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Product'
