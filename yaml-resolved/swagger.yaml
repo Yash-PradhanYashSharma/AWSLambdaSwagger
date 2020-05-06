@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: ManufacturerAPI
+  description: Manufacturer API
+  version: 1.0.0
+servers:
+- url: https://virtserver.swaggerhub.com/YashTech/ManufacturerAPI/1.0.0
+  description: SwaggerHub API Auto Mocking
+paths:
+  /manufacturer/{id}:
+    get:
+      summary: searches Manufacturer
+      description: |
+        By passing in the manufacturer id, you can search for available manufacturer in the system
+      operationId: searchManufacturer
+      parameters:
+      - name: id
+        in: path
+        description: Manufacturer ID to return.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: search results matching criteria
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Manufacturer'
+        "400":
+          description: bad input parameter
+components:
+  schemas:
+    Manufacturer:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        homePage:
+          type: string
+          format: url
+        phone:
+          type: string
